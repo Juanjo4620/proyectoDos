@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <path d="M 200 140 L 220 120 L 320 120 L 340 140 L 340 260 Q 300 280 300 280 Q 300 280 200 260 Z" fill="#3d2817" stroke="#2b1810"/>
+  <line x1="250" y1="140" x2="250" y2="260" stroke="#2b1810" stroke-width="2"/>
+  <line x1="350" y1="140" x2="350" y2="260" stroke="#2b1810" stroke-width="2"/>
+  <text x="300" y="320" font-size="18" font-family="Arial, Helvetica, sans-serif" fill="#1f2937" text-anchor="middle">Chaqueta de Cuero</text>
+</svg>

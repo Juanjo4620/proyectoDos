@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Reporte de Categorías{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Reporte de Ventas por Categoría</h1>
+    
+    <div class="row mb-4">
+        {% for item in reporte %}
+        <div class="col-md-4 mb-3">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">{{ item.categoria.nombre }}</h5>
+                    <p class="card-text">
+                        <strong>Total Ventas:</strong> {{ item.total_ventas }}<br>
+                        <strong>Ingreso:</strong> <span class="text-success">${{ item.ingreso|floatformat:2 }}</span><br>
+                        <strong>Productos:</strong> {{ item.productos }}
+                    </p>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Tabla Comparativa</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Categoría</th>
+                        <th class="text-end">Ventas</th>
+                        <th class="text-end">Ingreso Total</th>
+                        <th class="text-end">Productos en Stock</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in reporte %}
+                    <tr>
+                        <td>{{ item.categoria.nombre }}</td>
+                        <td class="text-end">{{ item.total_ventas }}</td>
+                        <td class="text-end text-success">${{ item.ingreso|floatformat:2 }}</td>
+                        <td class="text-end">{{ item.productos }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    h1 {
+        color: #1f4788;
+        margin-bottom: 1.5rem;
+        border-bottom: 3px solid #1f4788;
+        padding-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}

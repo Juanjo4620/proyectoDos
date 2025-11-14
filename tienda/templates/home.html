@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Inicio - Tienda de Electrónica{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h1 class="card-title">
+                    <i class="bi bi-tv" style="font-size: 3rem; color: #1f4788;"></i>
+                </h1>
+                <h2>Bienvenido a la Tienda de Electrónica</h2>
+                <p class="lead text-muted">Gestiona inventario, ventas y accede a reportes de tecnología</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="bi bi-bag-check"></i> Ventas</h5>
+            </div>
+            <div class="card-body">
+                <p>Registra y visualiza todas las transacciones de ventas.</p>
+                <a href="{% url 'tienda:ventas' %}" class="btn btn-primary">
+                    <i class="bi bi-arrow-right"></i> Ir a Ventas
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if puede_ver_reportes %}
+    <div class="col-md-6">
+        <div class="card mb-4">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="bi bi-graph-up"></i> Reportes</h5>
+            </div>
+            <div class="card-body">
+                <p>Accede a reportes detallados de ventas con filtros avanzados y descarga en PDF.</p>
+                <a href="{% url 'tienda:reporte_ventas' %}" class="btn btn-success">
+                    <i class="bi bi-arrow-right"></i> Ver Reportes
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+{% if user.is_staff %}
+<div class="row">
+    <div class="col-12">
+        <div class="alert alert-info">
+            <i class="bi bi-info-circle"></i>
+            <strong>Modo Administrador:</strong> Tienes acceso al panel de administración en <a href="/admin/">/admin/</a>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<style>
+    .card {
+        border: none;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    h1, h2 {
+        color: #1f4788;
+    }
+</style>
+{% endblock %}

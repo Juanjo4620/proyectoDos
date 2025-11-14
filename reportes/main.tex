@@ -1,0 +1,378 @@
+\documentclass[12pt]{report}
+\usepackage[margin=2.5cm]{geometry}
+\setlength{\headheight}{14.5pt}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{Tienda de Electronica - Django}
+\lhead{\today}
+\rfoot{\thepage}
+
+\title{Tienda de Electronica\\Sistema de Ventas en Linea con Django}
+\author{Juanjo}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\newpage
+\tableofcontents
+\newpage
+
+\chapter*{Introduccion}
+\addcontentsline{toc}{chapter}{Introduccion}
+
+Este reporte documenta el desarrollo de un sistema de tienda en linea de electronica basado en Django 5.2.8. El proyecto implementa un conjunto completo de funcionalidades para gestionar productos, ventas, usuarios con control de acceso y reportes analiticos.
+
+\section*{Objetivo General}
+
+Desarrollar una aplicacion web que permita:
+\begin{itemize}
+    \item Gestionar un catalogo de productos electronicos
+    \item Implementar un carrito de compras funcional
+    \item Registrar transacciones de ventas
+    \item Generar reportes de ventas en formato web y PDF
+    \item Controlar acceso mediante autenticacion y permisos
+    \item Servir como base para despliegue en entornos de produccion
+\end{itemize}
+
+\section*{Alcance}
+
+El sistema incluye:
+\begin{itemize}
+    \item \textbf{Frontend}: Interfaz web responsiva con Bootstrap 5
+    \item \textbf{Backend}: API REST implicita mediante vistas basadas en funciones
+    \item \textbf{Base de datos}: SQLite (desarrollo) / PostgreSQL (produccion)
+    \item \textbf{Reportes}: Generacion de PDF con ReportLab
+    \item \textbf{Autenticacion}: Sistema de usuarios de Django con permisos personalizados
+\end{itemize}
+
+\newpage
+
+\chapter*{Requisitos Tecnicos}
+\addcontentsline{toc}{chapter}{Requisitos Tecnicos}
+
+\section*{Requisitos Funcionales}
+
+\begin{enumerate}
+    \item \textbf{Gestion de Productos}
+    \begin{itemize}
+        \item Crear, leer, actualizar y eliminar (CRUD) productos
+        \item Organizar productos por categorias
+        \item Mostrar informacion de: nombre, precio, stock
+    \end{itemize}
+    
+    \item \textbf{Carrito de Compras}
+    \begin{itemize}
+        \item Agregar productos al carrito
+        \item Modificar cantidades
+        \item Eliminar productos
+        \item Procesar compras (crear registros de venta)
+    \end{itemize}
+    
+    \item \textbf{Ventas y Transacciones}
+    \begin{itemize}
+        \item Registrar cada compra con detalles (producto, cantidad, fecha)
+        \item Reducir automaticamente el stock al procesar compra
+        \item Asociar vendedor a cada transaccion
+    \end{itemize}
+    
+    \item \textbf{Reportes}
+    \begin{itemize}
+        \item Reporte de ventas totales por periodo
+        \item Desglose por categoria de producto
+        \item Analisis por producto individual
+        \item Exportar a PDF
+        \item Filtros por fecha, categoria, producto
+    \end{itemize}
+    
+    \item \textbf{Autenticacion y Control de Acceso}
+    \begin{itemize}
+        \item Login/logout de usuarios
+        \item Registro de nuevos usuarios
+        \item Asignacion automatica de permisos
+        \item Acceso restringido a reportes y modulo de ventas
+    \end{itemize}
+\end{enumerate}
+
+\section*{Requisitos No Funcionales}
+
+\begin{itemize}
+    \item \textbf{Seguridad}: HTTPS en produccion, proteccion CSRF, cookies seguras
+    \item \textbf{Rendimiento}: Consultas optimizadas con select\_related
+    \item \textbf{Disponibilidad}: Despliegue en Render con base de datos PostgreSQL
+    \item \textbf{Escalabilidad}: Estructura preparada para multiples instancias
+    \item \textbf{Mantenibilidad}: Codigo modular, documentacion clara
+\end{itemize}
+
+\newpage
+
+\chapter*{Arquitectura del Sistema}
+\addcontentsline{toc}{chapter}{Arquitectura del Sistema}
+
+\section*{Arquitectura General}
+
+El sistema sigue el patron \textbf{MTV (Model-Template-View)} de Django:
+
+\subsection*{Componentes MTV}
+
+\begin{verbatim}
+Model    : Modelos de datos (Producto, Venta, CarritoItem)
+Template : Plantillas HTML con Bootstrap 5
+View     : Logica de negocio (vistas basadas en funciones)
+\end{verbatim}
+
+\section*{Modelos de Datos}
+
+\begin{verbatim}
+class Categoria(models.Model):
+    nombre = models.CharField(max_length=50)
+    descripcion = models.TextField(blank=True)
+
+class Producto(models.Model):
+    nombre = models.CharField(max_length=100)
+    categoria = models.ForeignKey(Categoria, on_delete=models.CASCADE)
+    precio = models.DecimalField(max_digits=10, decimal_places=2)
+    stock = models.PositiveIntegerField(default=0)
+
+class Venta(models.Model):
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField()
+    fecha = models.DateField(auto_now_add=True)
+    vendedor = models.ForeignKey(User, on_delete=models.SET_NULL, null=True)
+    
+    def total(self):
+        return self.cantidad * self.producto.precio
+
+class CarritoItem(models.Model):
+    usuario = models.ForeignKey(User, on_delete=models.CASCADE)
+    producto = models.ForeignKey(Producto, on_delete=models.CASCADE)
+    cantidad = models.PositiveIntegerField(default=1)
+    fecha_agregado = models.DateTimeField(auto_now_add=True)
+\end{verbatim}
+
+\section*{Flujo de Datos}
+
+\begin{enumerate}
+    \item Usuario accede a /productos/ (catalogo)
+    \item Elige productos y los agrega al carrito
+    \item Revisa carrito en /carrito/
+    \item Procesa compra: se crean registros de Venta, se reduce stock
+    \item Sistema redirige a pagina de exito
+    \item Usuario accede a /reportes/ventas/ para analisis
+\end{enumerate}
+
+\newpage
+
+\chapter*{Tecnologias Utilizadas}
+\addcontentsline{toc}{chapter}{Tecnologias Utilizadas}
+
+\begin{verbatim}
+Django 5.2.8         - Framework web
+Python 3.13          - Lenguaje de programacion
+Bootstrap 5          - Interfaz responsiva
+SQLite/PostgreSQL    - Base de datos
+ReportLab 4.4.4      - Generacion de PDF
+WhiteNoise 6.5.0     - Servir archivos estaticos
+Gunicorn 21.2.0      - Servidor WSGI
+Render               - Plataforma de despliegue
+\end{verbatim}
+
+\newpage
+
+\chapter*{Implementacion}
+\addcontentsline{toc}{chapter}{Implementacion}
+
+\section*{Estructura del Proyecto}
+
+\begin{verbatim}
+proyecto2.1/
+  proyecto_dos/            (Configuracion Django)
+    settings.py
+    urls.py
+    wsgi.py
+    asgi.py
+  tienda/                  (Aplicacion principal)
+    models.py
+    views.py
+    urls.py
+    admin.py
+    templates/
+      base.html
+      home.html
+      catalogo.html
+      carrito.html
+      login.html
+      signup.html
+      reportes/
+        reporte_ventas.html
+        reporte_categorias.html
+        reporte_productos.html
+    static/
+      tienda/
+        css/
+        js/
+        img/
+    migrations/
+  manage.py
+  requirements.txt
+  build.sh
+  Procfile
+  runtime.txt
+  .gitignore
+  README.md
+  reportes/
+    main.tex
+\end{verbatim}
+
+\section*{Rutas de la Aplicacion}
+
+\begin{verbatim}
+URL                          Vista                     Descripcion
+/                            home                      Dashboard principal
+/signup/                     signup                    Registro de usuarios
+/login/                      login                     Autenticacion
+/productos/                  catalogo                  Catalogo de productos
+/carrito/                    carrito                   Ver carrito
+/carrito/agregar/            agregar_carrito           POST: agregar item
+/carrito/procesar/           procesar_compra           POST: procesar compra
+/ventas/                     ventas                    Listado de ventas
+/reportes/ventas/            reporte_ventas            Reporte de ventas
+/reportes/categorias/        reporte_por_categoria    Reporte por categoria
+/reportes/productos/         reporte_por_producto     Reporte por producto
+\end{verbatim}
+
+\section*{Funcionalidades Clave}
+
+\subsection*{1. Carrito de Compras}
+
+El carrito se implementa con el modelo CarritoItem:
+\begin{itemize}
+    \item Relacion ManyToOne con User
+    \item Constraint unique\_together para evitar duplicados
+    \item Metodo subtotal() para calcular costo de cada item
+\end{itemize}
+
+\subsection*{2. Procesamiento de Compra}
+
+Al procesar compra:
+\begin{enumerate}
+    \item Se itera sobre los items del carrito
+    \item Se crea un registro Venta por cada item
+    \item Se reduce el stock del producto
+    \item Se vacia el carrito
+    \item Se redirige a pagina de exito
+\end{enumerate}
+
+\subsection*{3. Generacion de Reportes PDF}
+
+Usa ReportLab para crear tablas dinamicas:
+\begin{itemize}
+    \item Resumen general (total ventas, ingresos, productos unicos)
+    \item Desglose por categoria con promedios
+    \item Manejo robusto de errores y valores ausentes
+\end{itemize}
+
+\subsection*{4. Autenticacion y Permisos}
+
+El sistema implementa decoradores para proteger vistas:
+
+\begin{verbatim}
+@login_required
+@permission_required('tienda.view_venta', raise_exception=True)
+def ventas(request):
+    # Solo usuarios autenticados con permiso 'view_venta'
+    pass
+
+def signup(request):
+    # Al registrarse, se asigna automaticamente 'view_venta'
+    user.user_permissions.add(perm)
+\end{verbatim}
+
+\newpage
+
+\chapter*{Consideraciones de Seguridad}
+\addcontentsline{toc}{chapter}{Consideraciones de Seguridad}
+
+Medidas de Seguridad Implementadas:
+
+\begin{enumerate}
+    \item \textbf{HTTPS Obligatorio}: SECURE\_SSL\_REDIRECT = True en produccion
+    \item \textbf{Cookies Seguras}: SESSION\_COOKIE\_SECURE, CSRF\_COOKIE\_SECURE
+    \item \textbf{HSTS}: Cabecera Strict-Transport-Security (configurable)
+    \item \textbf{CSRF Protection}: Validacion de tokens en formularios
+    \item \textbf{XFrame Options}: Proteccion contra clickjacking
+    \item \textbf{Proxy Headers}: X-Forwarded-Proto, X-Forwarded-Host
+    \item \textbf{SECRET\_KEY}: Requerida como variable de entorno en produccion
+    \item \textbf{DEBUG = False}: En produccion no expone informacion sensible
+\end{enumerate}
+
+\newpage
+
+\chapter*{Despliegue en Render}
+\addcontentsline{toc}{chapter}{Despliegue en Render}
+
+\section*{Pasos de Despliegue}
+
+\begin{enumerate}
+    \item Crear repositorio en GitHub
+    \item Crear servicio web en Render vinculado al repo
+    \item Configurar variables de entorno:
+    \begin{itemize}
+        \item SECRET\_KEY
+        \item DATABASE\_URL
+        \item ALLOWED\_HOSTS
+        \item CSRF\_TRUSTED\_ORIGINS
+    \end{itemize}
+    \item Build command: bash build.sh
+    \item Start command: gunicorn proyecto\_dos.wsgi:application
+\end{enumerate}
+
+\section*{Variables de Entorno Recomendadas}
+
+\begin{verbatim}
+SECRET_KEY=tu_clave_super_secreta
+DATABASE_URL=postgres://user:pass@host:5432/dbname
+ALLOWED_HOSTS=mi-app.onrender.com
+CSRF_TRUSTED_ORIGINS=https://mi-app.onrender.com
+DJANGO_DEBUG=False
+SECURE_HSTS_SECONDS=31536000
+SECURE_HSTS_INCLUDE_SUBDOMAINS=True
+SECURE_HSTS_PRELOAD=True
+\end{verbatim}
+
+\newpage
+
+\chapter*{Conclusion}
+\addcontentsline{toc}{chapter}{Conclusion}
+
+Se ha desarrollado exitosamente un sistema completo de tienda en linea usando Django. El proyecto:
+
+\begin{itemize}
+    \item Cumple con todos los requisitos funcionales
+    \item Implementa seguridad en multiples niveles
+    \item Esta preparado para despliegue en produccion
+    \item Mantiene codigo modular y escalable
+    \item Incluye documentacion y configuracion completas
+\end{itemize}
+
+El sistema es listo para ser desplegado en Render y escalar segun sea necesario. Se recomienda:
+
+\begin{enumerate}
+    \item Realizar pruebas de carga antes de despliegue en produccion
+    \item Configurar backups automaticos de base de datos
+    \item Monitorear logs y errores en Render
+    \item Implementar tests unitarios en el futuro
+    \item Considerar cache (Redis) para mejorar rendimiento
+\end{enumerate}
+
+\vspace{2cm}
+\hrule
+\vspace{0.5cm}
+
+Proyecto completado: \today
+
+\end{document}

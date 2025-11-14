@@ -1,0 +1,150 @@
+# 🔐 ACCESO RÁPIDO AL SISTEMA
+
+## 🚀 PARA INICIAR EL SERVIDOR
+
+```powershell
+cd "C:\Users\Juanjo\OneDrive\Documents\IPN\04\tpdaw\p2\proyecto2.1"
+python manage.py runserver 8000
+```
+
+El servidor se iniciará en: **http://localhost:8000/**
+
+---
+
+## 🔑 CREDENCIALES DE ACCESO
+
+### 1️⃣ Administrador (Acceso Total)
+```
+URL: http://localhost:8000/login/
+Usuario: admin
+Contraseña: admin123
+```
+✅ Ver todo, crear ventas, descargar PDFs, panel admin
+
+### 2️⃣ Vendedor (Acceso Limitado)
+```
+URL: http://localhost:8000/login/
+Usuario: vendedor
+Contraseña: vendedor123
+```
+✅ Ver ventas, reportes básicos (sin PDFs)
+
+### 3️⃣ Gerente de Reportes (Reportes Avanzados)
+```
+URL: http://localhost:8000/login/
+Usuario: gerente
+Contraseña: gerente123
+```
+✅ Todos los reportes, filtros avanzados, descargar PDFs
+
+---
+
+## 📍 RUTAS ÚTILES
+
+Después de iniciar sesión:
+
+| Ruta | Descripción |
+|------|------------|
+| `/` | Página principal |
+| `/ventas/` | Listado de ventas |
+| `/reportes/ventas/` | Reporte con PDF |
+| `/reportes/categorias/` | Análisis por categoría |
+| `/reportes/productos/` | Análisis por producto |
+| `/admin/` | Panel administrativo |
+
+---
+
+## 📋 ORDEN DE NAVEGACIÓN RECOMENDADO
+
+1. **Inicio:** `/` - Ver dashboard
+2. **Ventas:** `/ventas/` - Ver transacciones
+3. **Reportes:** `/reportes/ventas/` - Analizar con filtros
+4. **PDF:** Botón "Descargar PDF" en reportes
+5. **Admin:** `/admin/` - Crear nuevos productos/ventas
+
+---
+
+## 🎯 QUÉ HACER PRIMERO
+
+### Como Admin:
+```
+1. Inicia sesión con: admin / admin123
+2. Ve a: /reportes/ventas/
+3. Prueba los filtros de fecha, categoría, producto
+4. Descarga un PDF con "Descargar PDF"
+5. Ve a /admin/ para crear más datos
+```
+
+### Como Vendedor:
+```
+1. Inicia sesión con: vendedor / vendedor123
+2. Ve a: /ventas/ - verás todas las ventas
+3. No tienes acceso a reportes PDF
+```
+
+### Como Gerente:
+```
+1. Inicia sesión con: gerente / gerente123
+2. Ve a: /reportes/ventas/
+3. Filtra y descarga PDFs
+4. Análisis de categorías y productos
+```
+
+---
+
+## 🔄 SI NECESITAS REINICIAR
+
+### Detener el servidor:
+```
+Presiona: CTRL + BREAK en la terminal
+```
+
+### Volver a iniciar:
+```
+python manage.py runserver 8000
+```
+
+### Limpiar la base de datos (perder todos los datos):
+```
+del db.sqlite3
+python manage.py migrate
+python manage.py init_tienda  (o usar el script populate_db.py)
+```
+
+---
+
+## 💾 DATOS DISPONIBLES
+
+**Categorías:** Electrónica, Ropa, Alimentos, Hogar
+**Productos:** 14 artículos con precios realistas
+**Ventas:** 5 ejemplos para pruebas
+
+---
+
+## 📌 RECORDAR
+
+- ✅ El servidor corre en: `http://127.0.0.1:8000/`
+- ✅ No cerrar la ventana de terminal mientras trabajas
+- ✅ Hacer cambios en el código reinicia automáticamente
+- ✅ Los PDFs requieren ReportLab (ya instalado)
+- ✅ Base de datos SQLite en `db.sqlite3`
+
+---
+
+## 🆘 PROBLEMAS COMUNES
+
+**"No puedo descargar PDF"**
+→ Solo admin y gerente pueden descargar
+
+**"Página en blanco"**
+→ Revisa la terminal del servidor para errores
+
+**"401 Unauthorized"**
+→ Necesitas estar autenticado (ir a /login/)
+
+**"403 Forbidden"**
+→ Tu rol no tiene permiso (usa admin)
+
+---
+
+**Última actualización: 13 de Noviembre de 2025**

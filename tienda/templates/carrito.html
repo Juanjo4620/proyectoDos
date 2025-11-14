@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Carrito de Compras - Tienda de Electrónica{% endblock %}
+
+{% block content %}
+<div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0"><i class="bi bi-cart3"></i> Carrito de Compras</h5>
+    </div>
+    <div class="card-body">
+        {% if items %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Producto</th>
+                            <th>Categoría</th>
+                            <th>Precio Unitario</th>
+                            <th>Cantidad</th>
+                            <th>Subtotal</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}
+                        <tr>
+                            <td><strong>{{ item.producto.nombre }}</strong></td>
+                            <td>{{ item.producto.categoria.nombre }}</td>
+                            <td>${{ item.producto.precio|floatformat:2 }}</td>
+                            <td>
+                                <form method="post" action="{% url 'tienda:actualizar_cantidad' item.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <div class="input-group input-group-sm" style="max-width:120px;">
+                                        <input type="number" name="cantidad" min="1" max="{{ item.producto.stock }}" value="{{ item.cantidad }}" class="form-control">
+                                        <button class="btn btn-outline-secondary" type="submit" title="Actualizar cantidad">
+                                            <i class="bi bi-arrow-repeat"></i>
+                                        </button>
+                                    </div>
+                                </form>
+                            </td>
+                            <td><strong>${{ item.subtotal|floatformat:2 }}</strong></td>
+                            <td>
+                                <form method="post" action="{% url 'tienda:eliminar_carrito' item.id %}" class="d-inline">
+                                    {% csrf_token %}
+                                    <button class="btn btn-danger btn-sm" type="submit" title="Eliminar del carrito">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <a href="{% url 'tienda:productos' %}" class="btn btn-secondary">
+                        <i class="bi bi-arrow-left"></i> Seguir comprando
+                    </a>
+                </div>
+                <div class="col-md-6 text-end">
+                    <div class="alert alert-info d-inline-block">
+                        <h5 class="mb-0">Total: <strong>${{ total|floatformat:2 }}</strong></h5>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row mt-3">
+                <div class="col-md-12 text-end">
+                    <form method="post" action="{% url 'tienda:procesar_compra' %}" class="d-inline">
+                        {% csrf_token %}
+                        <button class="btn btn-success btn-lg" type="submit">
+                            <i class="bi bi-check-circle"></i> Procesar Compra
+                        </button>
+                    </form>
+                </div>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <p class="mb-0">Tu carrito está vacío.</p>
+            </div>
+            <a href="{% url 'tienda:productos' %}" class="btn btn-primary">
+                <i class="bi bi-shop"></i> Ir al Catálogo
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

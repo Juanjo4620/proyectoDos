@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="600" height="400">
+  <rect width="100%" height="100%" fill="#ffffff"/>
+  <circle cx="300" cy="180" r="90" fill="#e8c4a0" stroke="#d4a876"/>
+  <circle cx="300" cy="180" r="80" fill="#f0d9b5" stroke="#e0c4a0"/>
+  <text x="300" y="185" font-size="24" font-family="Arial, Helvetica, sans-serif" fill="#6b4423" text-anchor="middle" dominant-baseline="middle">Arroz</text>
+  <text x="300" y="340" font-size="18" font-family="Arial, Helvetica, sans-serif" fill="#1f2937" text-anchor="middle">Arroz 1kg</text>
+</svg>

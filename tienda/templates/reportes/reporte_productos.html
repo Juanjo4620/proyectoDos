@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Reporte de Productos{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h1>Reporte de Ventas por Producto</h1>
+    
+    <div class="card">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Análisis Detallado de Productos</h5>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th class="text-end">Cantidad Vendida</th>
+                        <th class="text-end">Veces Vendido</th>
+                        <th class="text-end">Ingreso Total</th>
+                        <th class="text-end">Ingreso Promedio</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in reporte %}
+                    <tr>
+                        <td><strong>{{ item.producto.nombre }}</strong></td>
+                        <td>{{ item.producto.categoria.nombre }}</td>
+                        <td class="text-end">{{ item.cantidad_vendida }} unidades</td>
+                        <td class="text-end">{{ item.total_ventas }} veces</td>
+                        <td class="text-end text-success"><strong>${{ item.ingreso|floatformat:2 }}</strong></td>
+                        <td class="text-end">
+                            ${{ item.ingreso_promedio|floatformat:2 }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<style>
+    h1 {
+        color: #1f4788;
+        margin-bottom: 1.5rem;
+        border-bottom: 3px solid #1f4788;
+        padding-bottom: 0.5rem;
+    }
+</style>
+{% endblock %}
