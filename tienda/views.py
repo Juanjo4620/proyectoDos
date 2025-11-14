@@ -52,7 +52,10 @@ def signup(request):
             if user is not None:
                 # Asignar permiso básico para ver ventas al usuario nuevo
                 try:
-                    perm = Permission.objects.get(codename='view_venta', content_type__app_label='tienda')
+                    perm = Permission.objects.filter(codename='view_venta').first()
+                    if perm:
+                        user.user_permissions.add(perm)
+
                     user.user_permissions.add(perm)
                 except Permission.DoesNotExist:
                     # Si no existe el permiso, continuar sin fallo (se puede asignar desde admin)
